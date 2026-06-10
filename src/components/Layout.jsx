@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { LayoutDashboard, BarChart3, LogIn, LogOut, User } from 'lucide-react'
+import { LayoutDashboard, BarChart3, Settings, LogIn, LogOut, User, Heart, Sparkles } from 'lucide-react'
 import AuthModal from './AuthModal'
 
 const Layout = ({ children }) => {
@@ -45,6 +45,18 @@ const Layout = ({ children }) => {
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Data Synthesis
                 </Link>
+
+                <Link
+                  to="/settings"
+                  className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive('/settings')
+                      ? 'bg-primary-50 text-primary-700'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </Link>
               </div>
             </div>
 
@@ -77,7 +89,7 @@ const Layout = ({ children }) => {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-200px)]">
         {!isAuthenticated && (
           <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800">
@@ -88,6 +100,33 @@ const Layout = ({ children }) => {
         )}
         {children}
       </main>
+
+      {/* Cute Footer */}
+      <footer className="bg-gradient-to-r from-pink-50 via-purple-50 to-blue-50 border-t-2 border-pink-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <div className="flex items-center space-x-2 text-gray-700">
+              <Sparkles className="w-5 h-5 text-pink-500 animate-pulse" />
+              <span className="text-lg font-semibold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Made with
+              </span>
+              <Heart className="w-5 h-5 text-red-500 animate-pulse" fill="currentColor" />
+              <span className="text-lg font-semibold bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                by Anika
+              </span>
+              <Sparkles className="w-5 h-5 text-purple-500 animate-pulse" />
+            </div>
+            <p className="text-sm text-gray-600 text-center">
+              Empowering teachers to track student progress with ease ✨
+            </p>
+            <div className="flex space-x-4 text-xs text-gray-500">
+              <span>© 2026 Student Tracker</span>
+              <span>•</span>
+              <span>Built for educators, by educators</span>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {showAuthModal && (
         <AuthModal onClose={() => setShowAuthModal(false)} />

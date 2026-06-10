@@ -31,6 +31,8 @@ export const DataProvider = ({ children }) => {
   const [students, setStudents] = useState([])
   const [testScores, setTestScores] = useState([])
   const [behavioralData, setBehavioralData] = useState([])
+  const [customCategories, setCustomCategories] = useState([])
+  const [customCategoryData, setCustomCategoryData] = useState({})
   const [grades, setGrades] = useState(['Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'])
   const [sections, setSections] = useState(['A', 'B', 'C', 'D', 'E'])
   const [loading, setLoading] = useState(true)
@@ -89,6 +91,10 @@ export const DataProvider = ({ children }) => {
     setStudents(data.students || [])
     setTestScores(data.testScores || [])
     setBehavioralData(data.behavioralData || [])
+    setCustomCategories(data.customCategories || [])
+    setCustomCategoryData(data.customCategoryData || {})
+    setGrades(data.grades || ['Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'])
+    setSections(data.sections || ['A', 'B', 'C', 'D', 'E'])
     setLoading(false)
   }
 
@@ -214,10 +220,74 @@ export const DataProvider = ({ children }) => {
     return behavioralData.filter(b => b.studentId === studentId)
   }
 
+  const updateGrades = (newGrades) => {
+    setGrades(newGrades)
+    saveSessionData({ grades: newGrades })
+  }
+
+  const updateSections = (newSections) => {
+    setSections(newSections)
+    saveSessionData({ sections: newSections })
+  }
+
+  const addCustomCategory = (category) => {
+    const newCategory = {
+      ...category,
+      id: `cat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    }
+    const updated = [...customCategories, newCategory]
+    setCustomCategories(updated)
+    saveSessionData({ customCategories: updated })
+    return newCategory.id
+  }
+
+  const updateCustomCategory = (categoryId, updates) => {
+    const updated = customCategories.map(c => 
+      c.id === categoryId ? { ...c, ...updates } : c
+    )
+    setCustomCategories(updated)
+    saveSessionData({ customCategories: updated })
+  }
+
+  const deleteCustomCategory = (categoryId) => {
+    const updated = customCategories.filter(c => c.id !== categoryId)
+    setCustomCategories(updated)
+    const newData = { ...customCategoryData }
+    delete newData[categoryId]
+    setCustomCategoryData(newData)
+    saveSessionData({ customCategories: updated, customCategoryData: newData })
+  }
+
+  const addCustomCategoryEntry = async (categoryId, studentId, data) => {
+    const entry = {
+      id: `entry_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      categoryId,
+      studentId,
+      data,
+      date: new Date().toISOString()
+    }
+    
+    const categoryEntries = customCategoryData[categoryId] || []
+    const updated = {
+      ...customCategoryData,
+      [categoryId]: [...categoryEntries, entry]
+    }
+    setCustomCategoryData(updated)
+    saveSessionData({ customCategoryData: updated })
+    return entry.id
+  }
+
+  const getCustomCategoryData = (categoryId, studentId) => {
+    const entries = customCategoryData[categoryId] || []
+    return studentId ? entries.filter(e => e.studentId === studentId) : entries
+  }
+
   const value = {
     students,
     testScores,
     behavioralData,
+    customCategories,
+    customCategoryData,
     grades,
     sections,
     loading,
@@ -232,7 +302,14 @@ export const DataProvider = ({ children }) => {
     deleteBehavioralData,
     getStudentsBySection,
     getTestScoresByStudent,
-    getBehavioralDataByStudent
+    getBehavioralDataByStudent,
+    updateGrades,
+    updateSections,
+    addCustomCategory,
+    updateCustomCategory,
+    deleteCustomCategory,
+    addCustomCategoryEntry,
+    getCustomCategoryData
   }
 
   return (

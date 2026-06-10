@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, Save, X } from 'lucide-react'
 import StudentForm from '../components/StudentForm'
 import TestScoreForm from '../components/TestScoreForm'
 import BehavioralForm from '../components/BehavioralForm'
+import CustomCategoryForm from '../components/CustomCategoryForm'
 
 const Dashboard = () => {
   const { 
@@ -23,6 +24,8 @@ const Dashboard = () => {
   const [showStudentForm, setShowStudentForm] = useState(false)
   const [showTestForm, setShowTestForm] = useState(false)
   const [showBehavioralForm, setShowBehavioralForm] = useState(false)
+  const [showCustomCategoryForm, setShowCustomCategoryForm] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState(null)
   const [editingStudent, setEditingStudent] = useState(null)
 
   const filteredStudents = students.filter(s => 
@@ -143,6 +146,10 @@ const Dashboard = () => {
               student={selectedStudent}
               onAddTestScore={() => setShowTestForm(true)}
               onAddBehavioral={() => setShowBehavioralForm(true)}
+              onAddCustomCategory={(category) => {
+                setSelectedCategory(category)
+                setShowCustomCategoryForm(true)
+              }}
               getTestScores={getTestScoresByStudent}
               getBehavioralData={getBehavioralDataByStudent}
               deleteTestScore={deleteTestScore}
@@ -176,6 +183,17 @@ const Dashboard = () => {
           student={selectedStudent}
         />
       )}
+
+      {showCustomCategoryForm && selectedStudent && selectedCategory && (
+        <CustomCategoryForm
+          onClose={() => {
+            setShowCustomCategoryForm(false)
+            setSelectedCategory(null)
+          }}
+          student={selectedStudent}
+          category={selectedCategory}
+        />
+      )}
     </div>
   )
 }
@@ -184,11 +202,13 @@ const StudentDetails = ({
   student, 
   onAddTestScore, 
   onAddBehavioral,
+  onAddCustomCategory,
   getTestScores,
   getBehavioralData,
   deleteTestScore,
   deleteBehavioralData
 }) => {
+  const { customCategories, getCustomCategoryData } = useData()
   const testScores = getTestScores(student.id)
   const behavioralData = getBehavioralData(student.id)
 
@@ -304,6 +324,51 @@ const StudentDetails = ({
           )}
         </div>
       </div>
+
+      {/* Custom Categories */}
+      {customCategories.map((category) => {
+        const categoryData = getCustomCategoryData(category.id, student.id)
+        return (
+          <div key={category.id} className="card">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+              <button 
+                onClick={() => onAddCustomCategory(category)} 
+                className="btn-primary text-sm inline-flex items-center"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Entry
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {categoryData.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">No {category.name.toLowerCase()} data recorded</p>
+              ) : (
+                categoryData
+                  .sort((a, b) => new Date(b.date) - new Date(a.date))
+                  .map(entry => (
+                    <div key={entry.id} className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                      <div className="flex justify-between items-start mb-2">
+                        <p className="text-sm text-gray-500">
+                          {new Date(entry.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(entry.data).map(([key, value]) => (
+                          <div key={key} className="text-sm">
+                            <span className="font-medium text-gray-700">{key}:</span>{' '}
+                            <span className="text-gray-900">{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+              )}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

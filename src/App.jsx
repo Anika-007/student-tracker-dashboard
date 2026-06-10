@@ -5,6 +5,7 @@ import { DataProvider } from './contexts/DataContext'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import DataSynthesis from './pages/DataSynthesis'
+import Settings from './pages/Settings'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/synthesis" element={<DataSynthesis />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </Layout>
         </DataProvider>
