@@ -29,6 +29,11 @@ export const AuthProvider = ({ children }) => {
     const sid = getSessionId()
     setSessionId(sid)
 
+    if (!auth) {
+      setLoading(false)
+      return
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser)

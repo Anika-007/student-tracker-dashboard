@@ -44,6 +44,11 @@ export const DataProvider = ({ children }) => {
   }, [user, sessionId])
 
   const loadUserData = () => {
+    if (!db) {
+      setLoading(false)
+      return
+    }
+
     const userId = user.uid
     
     const unsubStudents = onSnapshot(
@@ -88,7 +93,7 @@ export const DataProvider = ({ children }) => {
   }
 
   const saveToBackend = async (collectionName, data) => {
-    if (user) {
+    if (user && db) {
       const dataWithUser = { ...data, userId: user.uid }
       if (data.id) {
         await updateDoc(doc(db, collectionName, data.id), dataWithUser)
@@ -132,7 +137,7 @@ export const DataProvider = ({ children }) => {
   }
 
   const deleteStudent = async (studentId) => {
-    if (user) {
+    if (user && db) {
       await deleteDoc(doc(db, 'students', studentId))
     } else {
       setStudents(prev => prev.filter(s => s.id !== studentId))
@@ -186,7 +191,7 @@ export const DataProvider = ({ children }) => {
   }
 
   const deleteBehavioralData = async (entryId) => {
-    if (user) {
+    if (user && db) {
       await deleteDoc(doc(db, 'behavioralData', entryId))
     } else {
       setBehavioralData(prev => prev.filter(b => b.id !== entryId))
